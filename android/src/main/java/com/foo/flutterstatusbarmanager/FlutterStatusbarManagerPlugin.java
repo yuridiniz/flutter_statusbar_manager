@@ -36,44 +36,37 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         this.activity = registrar.activity();
     }
     public boolean isInCutMode(){
-        boolean isInCutMode = false;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            int cuteMode = ((WindowManager.LayoutParams)activity.getWindow().getDecorView().getLayoutParams()).layoutInDisplayCutoutMode;
-            if(cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT || cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES) {
-                isInCutMode = true;
-            }
-        }
+        if(activity == null)
+            return true;
 
-        return isInCutMode;
+        try {
+
+            boolean isInCutMode = false;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                int cuteMode = ((WindowManager.LayoutParams) activity.getWindow().getDecorView().getLayoutParams()).layoutInDisplayCutoutMode;
+                if (cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT || cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES) {
+                    isInCutMode = true;
+                }
+            }
+
+            return isInCutMode;
+        } catch(Exception e) {
+            return true;
+        }
     }
 
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if(call.method.equals("isCutMode")) {
-            result.success(isInCutMode());
-            return;
-        }
-
-        if(isInCutMode()) {
-
-            if(call.method.equals("getHeight")) {
-                result.success(0.0D);
-            }
-            else {
-                result.success(true);
-            }
-
-            return;
-        }
-
         switch (call.method) {
+            case "isCutMode":
+                handleIsInCutMode(call, result);
+                break;
             case "setColor":
                 handleSetColor(call, result);
                 break;
             case "setTranslucent":
-                boolean translucente = call.argument("translucent");
-                handleSetTranslucent(translucente, result);
+                handleSetTranslucent(call, result);
                 break;
             case "setHidden":
                 handleSetHidden(call, result);
@@ -98,6 +91,16 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         }
     }
 
+    private void handleIsInCutMode(MethodCall call, Result result) {
+        if (activity == null) {
+            Log.e("FlutterStatusbarManager", "FlutterStatusbarManager: Ignored status bar change, current activity is null.");
+            result.error("FlutterStatusbarManager", "FlutterStatusbarManager: Ignored status bar change, current activity is null.", null);
+            return;
+        }
+
+        result.success(isInCutMode());
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void handleSetColor(MethodCall call, Result result) {
         if (activity == null) {
@@ -107,6 +110,12 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            if(isInCutMode()) {
+                result.success(true);
+                return;
+            }
+
             final int color = ((Number) call.argument("color")).intValue();
             final boolean animated = call.argument("animated");
 
@@ -139,7 +148,7 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void handleSetTranslucent(final boolean translucent, Result result) {
+    private void handleSetTranslucent(MethodCall call, Result result) {
         if (activity == null) {
             Log.e("FlutterStatusbarManager", "FlutterStatusbarManager: Ignored status bar change, current activity is null.");
             result.error("FlutterStatusbarManager", "FlutterStatusbarManager: Ignored status bar change, current activity is null.", null);
@@ -147,7 +156,14 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            if(isInCutMode()) {
+                result.success(true);
+                return;
+            }
+
             View decorView = activity.getWindow().getDecorView();
+            boolean translucent = call.argument("translucent");
             if (translucent) {
                 decorView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
                     @Override
@@ -198,6 +214,11 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(isInCutMode()) {
+                result.success(true);
+                return;
+            }
+
             final String style = call.argument("style");
 
             View decorView = activity.getWindow().getDecorView();
@@ -216,6 +237,11 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
     }
 
     private void handleGetHeight(MethodCall call, Result result) {
+        if(isInCutMode()) {
+            result.success(0.0D);
+            return;
+        }
+
         int height = 0;
         int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -233,6 +259,11 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if(isInCutMode()) {
+                result.success(true);
+                return;
+            }
+
             @SuppressWarnings("unkchecked")
             final int color = ((Number) call.argument("color")).intValue();
             final boolean animated = call.argument("animated");
@@ -271,6 +302,11 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if(isInCutMode()) {
+                result.success(true);
+                return;
+            }
+
             final String style = call.argument("style");
 
             View decorView = activity.getWindow().getDecorView();
