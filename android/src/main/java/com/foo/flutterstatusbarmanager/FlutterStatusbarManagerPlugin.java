@@ -35,6 +35,7 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
     private FlutterStatusbarManagerPlugin(Registrar registrar) {
         this.activity = registrar.activity();
     }
+
     public boolean isInCutMode(){
         if(activity == null)
             return true;
@@ -92,12 +93,6 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
     }
 
     private void handleIsInCutMode(MethodCall call, Result result) {
-        if (activity == null) {
-            Log.e("FlutterStatusbarManager", "FlutterStatusbarManager: Ignored status bar change, current activity is null.");
-            result.error("FlutterStatusbarManager", "FlutterStatusbarManager: Ignored status bar change, current activity is null.", null);
-            return;
-        }
-
         result.success(isInCutMode());
     }
 
