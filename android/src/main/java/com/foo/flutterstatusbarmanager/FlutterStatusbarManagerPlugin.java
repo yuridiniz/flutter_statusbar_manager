@@ -37,23 +37,25 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
     }
 
     public boolean isInCutMode(){
-        if(activity == null)
-            return true;
-
-        try {
-
-            boolean isInCutMode = false;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                int cuteMode = ((WindowManager.LayoutParams) activity.getWindow().getDecorView().getLayoutParams()).layoutInDisplayCutoutMode;
-                if (cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT || cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES) {
-                    isInCutMode = true;
-                }
-            }
-
-            return isInCutMode;
-        } catch(Exception e) {
-            return true;
-        }
+        return false;
+//
+//        if(activity == null)
+//            return true;
+//
+//        try {
+//
+//            boolean isInCutMode = false;
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+//                int cuteMode = ((WindowManager.LayoutParams) activity.getWindow().getDecorView().getLayoutParams()).layoutInDisplayCutoutMode;
+//                if (cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT || cuteMode == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES) {
+//                    isInCutMode = true;
+//                }
+//            }
+//
+//            return isInCutMode;
+//        } catch(Exception e) {
+//            return true;
+//        }
     }
 
 
@@ -152,10 +154,10 @@ public class FlutterStatusbarManagerPlugin implements MethodCallHandler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            if(isInCutMode()) {
-                result.success(true);
-                return;
-            }
+//            if(isInCutMode()) {
+//                result.success(true);
+//                return;
+//            }
 
             View decorView = activity.getWindow().getDecorView();
             boolean translucent = call.argument("translucent");
